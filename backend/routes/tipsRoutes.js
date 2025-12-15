@@ -353,7 +353,7 @@ router.get("/trending/tags", auth, async (req, res) => {
       },
     },
     { $sort: { count: -1 } },
-    { $limit: 5 },
+    { $limit: 3 },
   ]);
 
   // Mock AI tags (later replace with ML service)

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { getTips } from "../services/api";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
@@ -8,6 +8,14 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import axios from "axios";
 import RightSidebar from "../components/feed/RightSidebar";
+import {
+  Heart,
+  MessageCircle,
+  Bookmark,
+  Share2,
+  MoreHorizontal,
+} from "lucide-react";
+import "../App.css"
 
 interface Tip {
   _id: string;
@@ -36,6 +44,11 @@ const [page, setPage] = useState(1);
 const [hasMore, setHasMore] = useState(true);
  const [sort, setSort] = useState("latest");
   const [tag, setTag] = useState<string | null>(null);
+const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+const [heartAnim, setHeartAnim] = useState<string | null>(null);
+const lastTap = useRef<Record<string, number>>({});
+const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
+
 
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
@@ -75,6 +88,21 @@ const [hasMore, setHasMore] = useState(true);
     );
     fetchTips();
   };
+  const handleDoubleTap = (tipId: string) => {
+  const now = Date.now();
+  const last = lastTap.current[tipId] || 0;
+
+  if (now - last < 300) {
+    // DOUBLE TAP DETECTED
+    likeTip(tipId); // 🔥 backend untouched
+    setHeartAnim(tipId);
+
+    setTimeout(() => setHeartAnim(null), 800);
+  }
+
+  lastTap.current[tipId] = now;
+};
+
 
   const bookmarkTip = async (id: string) => {
     await axios.post(
@@ -161,235 +189,398 @@ const replyToComment = async (
 
   return (
     <>
-      <div className="min-h-screen bg-gray-100 py-6">
+      <div className="min-h-screen bg-gray-100 py-0">
         <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
 
         {/* LEFT SIDEBAR */}
-        <aside className="col-span-3 hidden lg:block">
+        <aside className="col-span-3 hidden lg:block sticky top-14 h-fit ">
           <LeftSidebar sort={sort} setSort={setSort} setTag={setTag} />
         </aside>
 
         {/* FEED */}
-        <main className="col-span-12 lg:col-span-6">
-          {/* your existing feed cards go here */}
-          <div className="max-w-md mx-auto space-y-6">
-             
-          {loading && <p className="text-center text-gray-500">Loading...</p>}
+        {/* FEED */}
+<main className="col-span-12 lg:col-span-6">
+  <div className="flex flex-col items-center space-y-6">
+    {loading && <p className="text-gray-500 text-center">Loading...</p>}
 
-          {tips.map(tip => {
-            const date = new Date(tip.createdAt);
+    {tips.map((tip) => {
+      const date = new Date(tip.createdAt);
 
-            return (
-              <div
-                key={tip._id}
-                className="bg-white border rounded-xl overflow-hidden"
-              >
-                {/* Header */}
-                <div className="flex justify-between px-4 py-3 text-sm">
-                  <span className="font-medium">
-                    {tip.user?.name || "Anonymous"}
-                  </span>
-                  <span className="text-gray-400">
-                    {date.toLocaleDateString("en-IN", {
-                      day: "numeric",
-                      month: "short",
-                    })}{" "}
-                    •{" "}
-                    {date.toLocaleTimeString("en-IN", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
+      return (
+        <div
+          key={tip._id}
+          className="w-full bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3">
+  {/* Left: Avatar + Name */}
+  <div className="flex items-center gap-3">
+    {/* Avatar */}
+    <div
+      className="
+        w-9 h-9
+        rounded-full
+        bg-gradient-to-tr from-purple-500 to-purple-400
+        flex items-center justify-center
+        text-white text-sm font-semibold
+        select-none
+      "
+    >
+      {tip.user?.name?.charAt(0).toUpperCase() || "A"}
+    </div>
 
-                {/* Attachments */}
-                {tip.attachments && tip.attachments?.length > 0 && (
-                  <Swiper
-                    modules={[Navigation, Pagination]}
-                    navigation
-                    pagination={{ clickable: true }}
-                    className="w-full aspect-square bg-black"
-                  >
-                    {tip.attachments.map((file, i) => (
-                      <SwiperSlide key={i}>
-                        {/\.(jpg|jpeg|png|gif)$/i.test(file) ? (
-                          <img
-                            src={`http://localhost:5000${file}`}
-                            onClick={() =>
-                              setZoomImage(`http://localhost:5000${file}`)
-                            }
-                            className="w-full h-full object-cover cursor-pointer"
-                          />
-                        ) : (
-                          <div className="h-full flex items-center justify-center">
-                            <button
-                              onClick={() => {
-                                const link = document.createElement("a");
-                                link.href = `http://localhost:5000${file}`;
-                                link.download = file.split("/").pop() || "file";
-                                link.click();
-                              }}
-                              className="bg-purple-600 text-white px-4 py-2 rounded"
-                            >
-                              Download Document
-                            </button>
-                          </div>
-                        )}
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                )}
-                
+    {/* Name + Time */}
+    <div className="flex flex-col leading-tight">
+      <span className="text-sm font-medium text-gray-900">
+        {tip.user?.name || "Anonymous"}
+      </span>
 
-                {/* Content */}
-                <div className="px-4 py-3">
-                  <h2 className="font-semibold">{tip.title}</h2>
-                  <p className="text-sm text-gray-700 mt-1">{tip.content}</p>
+      <span className="text-[11px] text-gray-400">
+        {date.toLocaleDateString("en-IN", {
+          day: "numeric",
+          month: "short",
+        })}{" "}
+        •{" "}
+        {date.toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}
+      </span>
+    </div>
+  </div>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {tip.tags.map(tag => (
-                      <span key={tag} className="text-xs text-gray-500">
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-4 px-4 pb-2 text-sm">
-                  <button onClick={() => likeTip(tip._id)}>
-                    👍 {tip.likes?.length || 0}
-                  </button>
-
-                  <button onClick={() => addEmoji(tip._id, "🔥")}>
-                    🔥 {tip.emojis?.length || 0}
-                  </button>
-
-                  <button onClick={() => bookmarkTip(tip._id)}>
-                    {tip.bookmarks?.includes(userId || "") ? "🔖" : "📑"}
-                  </button>
-
-                  <button
-  onClick={() => {
-    setSelectedTipId(tip._id);
-    setShowForward(true);
-  }}
->
-  📤
-</button>
-
-                  <button onClick={() => shareTip(tip._id)}>🔗</button>
-               
-                </div>
-
-                {/* Comments */}
-                {/* Comments Toggle */}
-<div className="px-4 pb-3 text-sm">
-
-  {/* Show comments button */}
-{tip.comments && tip.comments.length > 0 && (
+  {/* Right: More (⋯) */}
   <button
-    onClick={() =>
-      setOpenComments(openComments === tip._id ? null : tip._id)
-    }
-    className="text-gray-500 mb-2 text-sm"
+    className="text-gray-400 hover:text-gray-600 transition"
+    aria-label="More options"
   >
-    {openComments === tip._id
-      ? "Hide comments"
-      : `View comments (${tip.comments.length})`}
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="w-5 h-5"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <circle cx="12" cy="5" r="1.5" />
+      <circle cx="12" cy="12" r="1.5" />
+      <circle cx="12" cy="19" r="1.5" />
+    </svg>
   </button>
-)}
+</div>
 
-{/* Comments List */}
-{openComments === tip._id && (
-  <div className="space-y-3 mb-2">
-    {tip.comments && tip.comments.map((c: any) => (
-      <div key={c._id} className="text-sm">
-        {/* Comment */}
-        <p>
-          <span className="font-medium">
-            {c.user?.name || "User"}:
-          </span>{" "}
-          {c.content}
-        </p>
 
-        {/* Comment Actions */}
-        <div className="flex items-center gap-3 text-xs text-gray-500 ml-2 mt-1">
-          <button onClick={() => setReplyTo(c._id)}>Reply</button>
+          {/* Attachments */}
+          {/* Attachments – Instagram-style */}
+{tip.attachments && tip.attachments.length > 0 && (
+  <Swiper
+    modules={[Navigation, Pagination]}
+    navigation
+    pagination={{ clickable: true }}
+    className="w-full aspect-square rounded-t-2xl overflow-hidden bg-gray-100"
+  >
+    {tip.attachments.map((file, i) => (
+      <SwiperSlide key={i} className="relative">
+        {/\.(jpg|jpeg|png|gif)$/i.test(file) ? (
+          <>
+            <img
+  src={`http://localhost:5000${file}`}
+  onClick={() => handleDoubleTap(tip._id)}
+  className="w-full h-full object-cover cursor-pointer select-none"
+/>
 
-          <button onClick={() => addCommentEmoji(tip._id, c._id, "❤️")}>
-            ❤️ {c.emojis?.length || 0}
-          </button>
-
-          <button onClick={() => addCommentEmoji(tip._id, c._id, "🔥")}>
-            🔥
-          </button>
-        </div>
-
-        {/* Replies */}
-        {c.replies && c.replies.length > 0 && (
-          <div className="ml-6 mt-2 space-y-1">
-            {c.replies.map((r: any, idx: number) => (
-              <p key={idx} className="text-xs">
-                <span className="font-medium">
-                  {r.user?.name || "User"}:
-                </span>{" "}
-                {r.content}
-              </p>
-            ))}
-          </div>
-        )}
-
-        {/* Reply Input */}
-        {replyTo === c._id && (
-          <input
-            placeholder="Write a reply..."
-            className="ml-6 mt-2 w-full border rounded px-2 py-1 text-xs"
-            onKeyDown={e => {
-              if (e.key === "Enter") {
-                replyToComment(
-                  tip._id,
-                  c._id,
-                  e.currentTarget.value
-                );
-                e.currentTarget.value = "";
-              }
-            }}
-          />
-        )}
-      </div>
-    ))}
+{/* ❤️ Heart Animation Overlay */}
+{heartAnim === tip._id && (
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <Heart
+      size={90}
+      className="text-white drop-shadow-lg animate-heart"
+      fill="white"
+    />
   </div>
 )}
 
+            {/* Overlay for multiple images */}
+            {tip.attachments &&tip.attachments.length > 1 && (
+              <div className="absolute top-2 right-2 bg-black/30 text-white text-xs px-2 py-1 rounded">
+                {i + 1} / {tip.attachments && tip.attachments.length}
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="h-full flex items-center justify-center bg-gray-50">
+            <button
+              onClick={() => {
+                const link = document.createElement("a");
+                link.href = `http://localhost:5000${file}`;
+                link.download = file.split("/").pop() || "file";
+                link.click();
+              }}
+              className="bg-purple-600 text-white px-4 py-2 rounded-xl shadow hover:bg-purple-700 transition"
+            >
+              Download
+            </button>
+          </div>
+        )}
+      </SwiperSlide>
+    ))}
+  </Swiper>
+)}
+{/* ================= ACTION BAR ================= */}
+<div className="flex items-center justify-between px-4 py-2 border-t border-gray-100">
+  {/* Left Actions */}
+  <div className="flex items-center gap-5">
+    <button
+      onClick={() => likeTip(tip._id)}
+      className="hover:text-purple-600 transition"
+    >
+      <Heart
+        size={22}
+        className={
+          tip.likes?.includes(userId || "")
+            ? "fill-purple-600 text-purple-600"
+            : "text-gray-700"
+        }
+      />
+    </button>
 
-  {/* Add Comment Input */}
-  <input
-  placeholder="Add a comment..."
-  className="w-full mt-1 border rounded px-2 py-1 text-sm"
-  onKeyDown={e => {
-    if (e.key === "Enter") {
-      addComment(tip._id, e.currentTarget.value);
-      e.currentTarget.value = "";
-      setOpenComments(tip._id);
-    }
-  }}
-/>
+    <button
+      onClick={() =>
+        setOpenComments(openComments === tip._id ? null : tip._id)
+      }
+      className="hover:text-purple-600 transition"
+    >
+      <MessageCircle size={22} className="text-gray-700" />
+    </button>
 
+    <button
+      onClick={() => shareTip(tip._id)}
+      className="hover:text-purple-600 transition"
+    >
+      <Share2 size={22} className="text-gray-700" />
+    </button>
+  </div>
+
+  {/* Right Actions */}
+  <div className="flex items-center gap-4">
+    <button
+      onClick={() => bookmarkTip(tip._id)}
+      className="hover:text-purple-600 transition"
+    >
+      <Bookmark
+        size={22}
+        className={
+          tip.bookmarks?.includes(userId || "")
+            ? "fill-purple-600 text-purple-600"
+            : "text-gray-700"
+        }
+      />
+    </button>
+
+    <button
+      onClick={() => {
+        setSelectedTipId(tip._id);
+        setShowForward(true);
+      }}
+      className="hover:text-gray-900 transition"
+    >
+      <MoreHorizontal size={22} className="text-gray-700" />
+    </button>
+  </div>
 </div>
 
-               
-               
+{/* Like count (Instagram style) */}
+<div className="px-4 pb-2 text-sm font-medium text-gray-900">
+  {tip.likes?.length || 0} likes
+</div>
 
+        
+{/* ================= CONTENT ================= */}
+<div className="px-4 pt-3 pb-2 text-sm text-gray-900">
+
+  {/* Title (acts like username) */}
+  <span className="font-semibold mr-1">
+    {tip.title}
+  </span>
+
+  {/* Caption + Tags */}
+  <span
+    className={`inline ${
+      !expanded[tip._id] ? "line-clamp-4" : ""
+    } leading-snug`}
+  >
+    {tip.content}
+
+    {tip.tags.length > 0 && (
+      <span className="ml-1">
+        {tip.tags.map(tag => (
+          <button
+            key={tag}
+            onClick={() => setTag(tag)}
+            className="text-purple-600 hover:text-purple-700 ml-1"
+          >
+            #{tag}
+          </button>
+        ))}
+      </span>
+    )}
+  </span>
+
+  {/* More / Less */}
+  {(tip.content.length > 120 || tip.tags.length > 0) && (
+    <button
+      onClick={() =>
+        setExpanded(prev => ({
+          ...prev,
+          [tip._id]: !prev[tip._id],
+        }))
+      }
+      className="block text-gray-400 hover:text-gray-600 mt-0.5"
+    >
+      {expanded[tip._id] ? "less" : "more"}
+    </button>
+  )}
+</div>
+
+{/* COMMENTS */}
+<div className="px-4 pb-3 text-sm">
+
+  {/* View all comments */}
+  {tip.comments?.length > 0 && (
+    <button
+      onClick={() =>
+        setOpenComments(openComments === tip._id ? null : tip._id)
+      }
+      className="text-gray-500 text-sm mb-1 hover:text-gray-700"
+    >
+      {openComments === tip._id
+        ? "Hide comments"
+        : `View all ${tip.comments.length} comments`}
+    </button>
+  )}
+
+  {/* Comments */}
+  {openComments === tip._id && (
+    <div className="space-y-2 mt-1">
+      {tip.comments.map((c: any) => {
+        const repliesOpen = openReplies[c._id];
+
+        return (
+          <div key={c._id} className="leading-snug">
+
+            {/* Comment */}
+            <p className="text-sm text-gray-900">
+              <span className="font-medium mr-1">
+                {c.user?.name || "user"}
+              </span>
+              {c.content}
+            </p>
+
+            {/* Meta row (8h · likes · Reply) */}
+            <div className="flex items-center gap-4 text-xs text-gray-400 ml-1 mt-0.5">
+              <span>0h</span>
+
+              <button
+                onClick={() => addCommentEmoji(tip._id, c._id, "❤️")}
+                className="hover:text-gray-600"
+              >
+                {c.emojis?.length || 1} likes
+              </button>
+
+              <button
+                onClick={() => setReplyTo(c._id)}
+                className="hover:text-gray-600"
+              >
+                Reply
+              </button>
+            </div>
+
+            {/* View replies */}
+            {c.replies?.length > 0 && (
+              <button
+                onClick={() =>
+                  setOpenReplies(prev => ({
+                    ...prev,
+                    [c._id]: !prev[c._id],
+                  }))
+                }
+                className="text-xs text-gray-500 mt-1 ml-1 hover:text-gray-700"
+              >
+                {repliesOpen
+                  ? "Hide replies"
+                  : `View replies (${c.replies.length})`}
+              </button>
+            )}
+
+            {/* Replies */}
+            {repliesOpen && c.replies?.length > 0 && (
+              <div className="ml-4 mt-1 space-y-1">
+                {c.replies.map((r: any, idx: number) => (
+                  <p key={idx} className="text-xs text-gray-800">
+                    <span className="font-medium mr-1">
+                      {r.user?.name || "user"}
+                    </span>
+                    {r.content}
+                  </p>
+                ))}
               </div>
-            );
-          })}
+            )}
+
+            {/* Reply input */}
+            {replyTo === c._id && (
+              <input
+                placeholder="Reply..."
+                className="
+                  ml-4 mt-1 w-full
+                  text-xs
+                  border-none
+                  bg-transparent
+                  focus:outline-none
+                  placeholder-gray-400
+                "
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    replyToComment(tip._id, c._id, e.currentTarget.value);
+                    e.currentTarget.value = "";
+                  }
+                }}
+              />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  )}
+
+  {/* Add comment */}
+  <input
+    placeholder="Add a comment…"
+    className="
+      w-full mt-2
+      text-sm
+      border-none
+      bg-transparent
+      focus:outline-none
+      placeholder-gray-400
+    "
+    onKeyDown={(e) => {
+      if (e.key === "Enter") {
+        addComment(tip._id, e.currentTarget.value);
+        e.currentTarget.value = "";
+        setOpenComments(tip._id);
+      }
+    }}
+  />
+</div>
+
+
         </div>
-        </main>
+      );
+    })}
+  </div>
+</main>
+
 
         {/* RIGHT SIDEBAR (next step) */}
-        <aside className="col-span-3 hidden lg:block">
+        <aside className="col-span-3 hidden lg:block sticky top-14 h-fit ">
           {/* Coming next */}
           <RightSidebar />
         </aside>

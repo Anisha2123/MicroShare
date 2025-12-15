@@ -73,142 +73,172 @@ export default function CreateTip() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
-      <div className="w-full max-w-3xl bg-white rounded-2xl border border-gray-200 px-6 sm:px-10 py-8">
+   <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
+  <div className="w-full max-w-100">
 
-        {/* Header */}
-        <h1 className="text-2xl font-semibold text-gray-900 mb-6">
+    {/* Card */}
+    <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
+
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+        <h1 className="text-base font-semibold text-gray-900">
           Share a Tip
         </h1>
 
-        {error && (
-          <div className="mb-4 text-sm text-red-600 bg-red-50 border px-4 py-3 rounded-lg">
-            {error}
+        <button
+          type="submit"
+          form="tipForm"
+          disabled={loading}
+          className="
+            px-4 py-1.5 rounded-md text-sm font-medium
+            bg-purple-600 text-white
+            hover:bg-purple-500
+            disabled:opacity-60
+          "
+        >
+          {loading ? "Posting…" : "Publish"}
+        </button>
+      </div>
+
+      {error && (
+        <div className="mx-6 mt-4 text-sm text-red-600 bg-red-50 px-4 py-2 rounded-md">
+          {error}
+        </div>
+      )}
+
+      {/* Form */}
+      <form id="tipForm" onSubmit={handleSubmit} className="px-6 py-6 space-y-6">
+
+        {/* Author Row */}
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-semibold">
+            A
           </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-
-          {/* Title */}
-          <input
-            type="text"
-            placeholder="Title"
-            className="w-full border rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-500"
-            value={form.title}
-            onChange={e => setForm({ ...form, title: e.target.value })}
-          />
-
-          {/* Content */}
-          <div className="border rounded-xl px-4 py-3">
-            <textarea
-              rows={5}
-              maxLength={MAX_CHARS}
-              placeholder="Write something valuable..."
-              className="w-full resize-none text-sm focus:outline-none"
-              value={form.content}
-              onChange={e => setForm({ ...form, content: e.target.value })}
-            />
-
-            {/* Toolbar */}
-            <div className="mt-3 flex items-center justify-between text-gray-400">
-              <div className="flex gap-4">
-                {/* Emoji */}
-                <button type="button" onClick={() => addEmoji("😊")}>
-                  <Smile size={18} />
-                </button>
-
-                {/* Image / Doc */}
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Image size={18} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Paperclip size={18} />
-                </button>
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  hidden
-                  multiple
-                  accept="image/*,.pdf,.doc,.docx"
-                  onChange={handleFileChange}
-                />
-              </div>
-
-              <span className="text-xs">
-                {form.content.length}/{MAX_CHARS}
-              </span>
-            </div>
-          </div>
-
-          {/* Attachments Preview */}
-{attachments.length > 0 && (
-  <div className="space-y-2">
-    {attachments.map((file, index) => (
-      <div
-        key={index}
-        className="flex items-center justify-between border rounded-lg px-4 py-2 text-sm bg-gray-50"
-      >
-        <div className="flex items-center gap-2 truncate">
-          {file.type.startsWith("image") ? "🖼️" : "📎"}
-          <span className="truncate max-w-[220px]">
-            {file.name}
+          <span className="text-sm font-medium text-gray-900">
+            Share something valuable
           </span>
         </div>
 
-        <button
-          type="button"
-          onClick={() =>
-            setAttachments(prev =>
-              prev.filter((_, i) => i !== index)
-            )
-          }
-          className="text-gray-400 hover:text-gray-600"
-        >
-          <X size={16} />
-        </button>
-      </div>
-    ))}
-  </div>
-)}
+        {/* Title */}
+        <input
+          type="text"
+          placeholder="Tip title"
+          value={form.title}
+          onChange={e => setForm({ ...form, title: e.target.value })}
+          className="
+            w-full text-lg font-medium text-gray-900
+            placeholder-gray-400
+            border-none focus:outline-none
+          "
+        />
 
+        {/* Divider */}
+        <div className="h-px bg-gray-100" />
 
-          {/* Tags */}
-          <input
-            type="text"
-            placeholder="Tags (comma separated)"
-            className="w-full border rounded-lg px-4 py-2.5 text-sm"
-            value={form.tags}
-            onChange={e => setForm({ ...form, tags: e.target.value })}
-          />
+        {/* Content */}
+        <textarea
+          rows={5}
+          maxLength={MAX_CHARS}
+          placeholder="Explain the tip clearly and concisely…"
+          value={form.content}
+          onChange={e => setForm({ ...form, content: e.target.value })}
+          className="
+            w-full resize-none text-sm text-gray-800
+            placeholder-gray-400
+            border-none focus:outline-none leading-relaxed
+          "
+        />
 
-          {/* Actions */}
-          <div className="flex justify-between items-center pt-4">
+        {/* Attachments Preview */}
+        {attachments.length > 0 && (
+          <div className="space-y-2">
+            {attachments.map((file, index) => (
+              <div
+                key={index}
+                className="
+                  flex items-center justify-between
+                  bg-gray-50 border border-gray-200
+                  rounded-lg px-4 py-2 text-sm
+                "
+              >
+                <span className="truncate max-w-[240px]">
+                  {file.name}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    setAttachments(prev =>
+                      prev.filter((_, i) => i !== index)
+                    )
+                  }
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Tags */}
+        <input
+          type="text"
+          placeholder="Tags (comma separated)"
+          value={form.tags}
+          onChange={e => setForm({ ...form, tags: e.target.value })}
+          className="
+            w-full text-sm text-gray-800
+            placeholder-gray-400
+            border border-gray-200 rounded-lg
+            px-3 py-2 focus:ring-1 focus:ring-purple-500
+          "
+        />
+
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+
+          {/* Tools */}
+          <div className="flex items-center gap-4 text-gray-500">
+            <button type="button" onClick={() => addEmoji("😊")}>
+              <Smile size={18} />
+            </button>
+
             <button
               type="button"
-              onClick={() => navigate(-1)}
-              className="text-sm text-gray-500"
+              onClick={() => fileInputRef.current?.click()}
             >
-              Cancel
+              <Image size={18} />
             </button>
 
             <button
-              type="submit"
-              disabled={loading}
-              className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2.5 rounded-lg text-sm"
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
             >
-              {loading ? "Posting..." : "Publish"}
+              <Paperclip size={18} />
             </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              hidden
+              multiple
+              accept="image/*,.pdf,.doc,.docx"
+              onChange={handleFileChange}
+            />
           </div>
-        </form>
-      </div>
+
+          {/* Counter */}
+          <span className="text-xs text-gray-400">
+            {form.content.length}/{MAX_CHARS}
+          </span>
+        </div>
+      </form>
     </div>
+  </div>
+</div>
+
+
+
   );
 }

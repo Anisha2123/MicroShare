@@ -5,7 +5,7 @@ import SavedTipsMini from "./SavedTipsMini";
 
 export default function RightSidebar() {
   return (
-    <aside className="hidden xl:block w-80 sticky top-20 h-fit">
+    <aside className="hidden xl:block w-80 sticky top-14 h-fit pt-6 px-4 bg-white rounded-2xl">
       <div className="space-y-6">
 
         {/* Suggested Users */}
