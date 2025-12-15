@@ -2,10 +2,12 @@ import { useEffect, useState } from "react";
 import { getTips } from "../services/api";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
+import LeftSidebar from "../components/feed/LeftSidebar";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import axios from "axios";
+import RightSidebar from "../components/feed/RightSidebar";
 
 interface Tip {
   _id: string;
@@ -32,7 +34,8 @@ const [openComments, setOpenComments] = useState<string | null>(null);
 const [replyTo, setReplyTo] = useState<string | null>(null);
 const [page, setPage] = useState(1);
 const [hasMore, setHasMore] = useState(true);
-
+ const [sort, setSort] = useState("latest");
+  const [tag, setTag] = useState<string | null>(null);
 
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("userId");
@@ -159,9 +162,18 @@ const replyToComment = async (
   return (
     <>
       <div className="min-h-screen bg-gray-100 py-6">
-        <div className="max-w-md mx-auto space-y-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
 
-          <h1 className="text-xl font-semibold text-center">Knowledge Feed</h1>
+        {/* LEFT SIDEBAR */}
+        <aside className="col-span-3 hidden lg:block">
+          <LeftSidebar sort={sort} setSort={setSort} setTag={setTag} />
+        </aside>
+
+        {/* FEED */}
+        <main className="col-span-12 lg:col-span-6">
+          {/* your existing feed cards go here */}
+          <div className="max-w-md mx-auto space-y-6">
+             
           {loading && <p className="text-center text-gray-500">Loading...</p>}
 
           {tips.map(tip => {
@@ -374,6 +386,16 @@ const replyToComment = async (
             );
           })}
         </div>
+        </main>
+
+        {/* RIGHT SIDEBAR (next step) */}
+        <aside className="col-span-3 hidden lg:block">
+          {/* Coming next */}
+          <RightSidebar />
+        </aside>
+
+      </div>
+        
       </div>
 
       {/* Image Zoom */}

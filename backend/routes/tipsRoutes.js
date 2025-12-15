@@ -4,9 +4,71 @@ const Tip = require("../models/Tips");
 const auth = require("../middleware/auth");
 const upload = require("../middleware/upload");
 const { getAllTips } = require("../controllers/tipsController");
-
+const User = require("../models/User");
 
 console.log("✅ tipsRoutes loaded");
+
+// GET /api/tip?sort=latest|popular|trending&tag=react&page=1&limit=10
+router.get("/", auth, async (req, res) => {
+  try {
+    const {
+      sort = "latest",
+      tag,
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    /* ---------- FILTER ---------- */
+    const query = { visibility: "public" };
+
+    if (tag) {
+      query.tags = tag;
+    }
+
+    if (sort === "saved") {
+      query.bookmarkedBy = req.user.id;
+    }
+
+    /* ---------- SORT ---------- */
+    let sortOption = { createdAt: -1 };
+
+    if (sort === "popular") {
+      sortOption = { likesCount: -1 };
+    }
+
+    if (sort === "trending") {
+      sortOption = { commentsCount: -1, likesCount: -1 };
+    }
+
+    /* ---------- PAGINATION ---------- */
+    const pageNumber = Number(page);
+    const pageSize = Number(limit);
+    const skip = (pageNumber - 1) * pageSize;
+
+    const tips = await Tip.find(query)
+      .sort(sortOption)
+      .skip(skip)
+      .limit(pageSize)
+      .populate("user", "name")
+      .populate("comments.user", "name")
+      .populate("comments.replies.user", "name");
+
+    const total = await Tip.countDocuments(query);
+
+    res.json({
+      tips,
+      hasMore: skip + tips.length < total,
+      total,
+      page: pageNumber,
+    });
+  } catch (err) {
+    console.error("Fetch tips error:", err);
+    res.status(500).json({
+      message: "Failed to fetch tips",
+    });
+  }
+});
+
 
 // Create Tip route
 router.post(
@@ -76,8 +138,10 @@ router.post("/:id/like", auth, async (req, res) => {
     const index = tip.likes.indexOf(req.user.id);
     if (index === -1) {
       tip.likes.push(req.user.id); // like
+      tip.likesCount++;
     } else {
       tip.likes.splice(index, 1); // unlike
+      tip.likesCount--;
     }
     await tip.save();
     res.json(tip);
@@ -272,6 +336,77 @@ router.post("/:tipId/comment/:commentId/emoji",
     }
   }
 );
+
+router.get("/trending/tags", auth, async (req, res) => {
+  const { range = "daily" } = req.query;
+
+  const days = range === "weekly" ? 7 : 1;
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
+  const tags = await Tip.aggregate([
+    { $match: { createdAt: { $gte: since } } },
+    { $unwind: "$tags" },
+    {
+      $group: {
+        _id: "$tags",
+        count: { $sum: 1 },
+      },
+    },
+    { $sort: { count: -1 } },
+    { $limit: 5 },
+  ]);
+
+  // Mock AI tags (later replace with ML service)
+  const enriched = tags.map((t, i) => ({
+    ...t,
+    ai: i < 2, // top 2 marked as AI
+  }));
+
+  res.json(enriched);
+});
+
+
+router.get("/popular", async (req, res) => {
+  try {
+    console.log("🔥 popular api hit");
+
+    const tips = await Tip.aggregate([
+      {
+        $addFields: {
+          likesCount: { $size: { $ifNull: ["$likes", []] } },
+          commentsCount: { $size: { $ifNull: ["$comments", []] } },
+        },
+      },
+      {
+        $sort: {
+          likesCount: -1,
+          commentsCount: -1,
+        },
+      },
+      { $limit: 5 },
+      {
+        $project: {
+          title: 1,
+          likesCount: 1,
+          commentsCount: 1,
+        },
+      },
+    ]);
+
+    res.json(tips);
+  } catch (err) {
+    console.error("Popular tips error:", err);
+    res.status(500).json([]);
+  }
+});
+
+
+router.get("/saved/mini", auth, async (req, res) => {
+  const user = await User.findById(req.user.id)
+    .populate("savedTips", "title");
+
+  res.json(user.savedTips.slice(0, 5));
+});
 
 
 module.exports = router;

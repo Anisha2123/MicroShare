@@ -80,8 +80,10 @@ const tipSchema = new mongoose.Schema(
 },
 
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    likesCount: { type: Number, default: 0 },
     emojis: [emojiSchema],
     comments: [commentSchema],
+    commentsCount: { type: Number, default: 0 },
     bookmarks: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true }

@@ -8,15 +8,21 @@ export const register = (data: { name: string; email: string; password: string }
 export const login = (data: { email: string; password: string }) =>
   axios.post(`${API_URL}/auth/login`, data);
 
-export const getTips = () => {
+export const getTips = (params?: {
+  page?: number;
+  sort?: string;
+  tag?: string;
+}) => {
   const token = localStorage.getItem("token");
 
   return axios.get(`${API_URL}/tip/tips`, {
+    params,
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 };
+
 
 export const createTip = (data: FormData) => {
   const token = localStorage.getItem("token");

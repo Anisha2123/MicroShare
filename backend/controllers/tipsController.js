@@ -14,7 +14,7 @@ exports.getAllTips = async (req, res) => {
       );
 
    tips.forEach(tip => {
-  console.log("ATTACHMENT:", tip.attachments);
+  // console.log("ATTACHMENT:", tip.attachments);
 });
 
 

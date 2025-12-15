@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   likedTips: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tip" }],
   savedTips: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tip" }],
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);
