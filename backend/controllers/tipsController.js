@@ -4,9 +4,19 @@ const Tip = require("../models/Tips");
 exports.getAllTips = async (req, res) => {
   try {
     const tips = await Tip.find()
-      .sort({ createdAt: -1 })        // latest first
-      .populate("user", "name email") // optional (safe fields only)
-      .select("title content tags createdAt");
+  .sort({ createdAt: -1 })
+      .populate("user", "name")
+      .populate("comments.user", "name")
+      .populate("comments.replies.user", "name")
+      .populate("emojis.user", "name")
+      .select(
+        "title content tags attachments createdAt user likes comments emojis"
+      );
+
+   tips.forEach(tip => {
+  console.log("ATTACHMENT:", tip.attachments);
+});
+
 
     res.status(200).json(tips);
   } catch (error) {

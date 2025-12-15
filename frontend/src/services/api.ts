@@ -18,14 +18,16 @@ export const getTips = () => {
   });
 };
 
-export const createTip = async (tipData: { title: string; content: string; tags: string[] }) => {
+export const createTip = (data: FormData) => {
   const token = localStorage.getItem("token");
-  return axios.post(`${API_URL}/tip`, tipData, {
+  return axios.post(`${API_URL}/tip`, data, {
     headers: {
       Authorization: `Bearer ${token}`,
+      "Content-Type": "multipart/form-data",
     },
   });
 };
+
 
 /* ✅ CREATE AXIOS INSTANCE (ONLY ADDITION) */
 const API = axios.create({
