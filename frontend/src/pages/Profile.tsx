@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import ProfileSidebar from "../components/ProfileSidebar";
 
 import {
   getFollowers,
@@ -137,9 +138,16 @@ export default function Profile() {
   const { user, stats } = profile;
 
   return (
+    <div className="flex min-h-screen bg-gray-50">
+  {/* Sidebar */}
+  <ProfileSidebar />
+
+  {/* Main Content */}
+  <main className="flex-1 ml-[260px] px-8">
+    {/* Profile / Feed / Dashboard */}
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
 
-<div className="bg-gray-50 max-w-5xl mx-auto px-6 py-12">
+<div className="bg-gray-50 max-w-5xl mx-auto px-6 py-10">
   <div className="
     bg-white/70
     backdrop-blur-xl
@@ -341,6 +349,9 @@ export default function Profile() {
       </div>
     </div>
    </div>
+  </main>
+</div>
+    
   );
 }
 
