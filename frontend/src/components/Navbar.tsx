@@ -131,6 +131,12 @@ export default function Navbar() {
             >
               Dashboard
             </Link>
+            <Link
+            to="/profile"
+            className="hover:text-purple-700 transition"
+          >
+            Profile
+          </Link>
 
             <div className="pt-3 border-t border-gray-200">
               {!token ? (

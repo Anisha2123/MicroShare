@@ -49,3 +49,19 @@ API.interceptors.request.use(req => {
 
 /* DASHBOARD */
 export const fetchDashboard = () => API.get("/dashboard");
+
+// ============Profile===============
+export const getFollowers = (userId: string) =>
+  API.get(`/users/${userId}/followers`);
+
+export const getFollowing = (userId: string) =>
+  API.get(`/users/${userId}/following`);
+
+export const updateBio = (bio: string) =>
+  API.patch("/users/profile", { bio });
+
+export const unfollowUser = (userId: string) =>
+  API.post(`/users/${userId}/unfollow`);
+
+export const removeFollower = (userId: string) =>
+  API.post(`/users/${userId}/remove-follower`);
