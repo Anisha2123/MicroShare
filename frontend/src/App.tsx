@@ -5,10 +5,12 @@ import Dashboard from "./pages/Dashboard";
 import Feed from "./pages/Feed";
 import CreateTip from "./pages/CreateTip";
 import Navbar from "./components/Navbar";
+import Profile from "./pages/Profile";
+
 
 const App = () => {
   const token = localStorage.getItem("token");
-
+  
   const PrivateRoute = ({ children }: { children: JSX.Element }) => {
     return token ? children : <Navigate to="/login" replace />;
   };
@@ -49,7 +51,14 @@ const App = () => {
               </PrivateRoute>
             }
           />
-
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile  />
+              </PrivateRoute>
+            }
+          />
           {/* Default route */}
           <Route path="*" element={<Navigate to={token ? "/dashboard" : "/login"} replace />} />
         </Routes>

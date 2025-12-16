@@ -43,6 +43,12 @@ export default function Navbar() {
           >
             Dashboard
           </Link>
+          <Link
+            to="/profile"
+            className="hover:text-purple-700 transition"
+          >
+            Profile
+          </Link>
         </nav>
 
         {/* Desktop Auth */}

@@ -21,7 +21,7 @@ export default function Register() {
     try {
       const res = await register({ name: form.name, email: form.email, password: form.password });
       localStorage.setItem("token", res.data.token);
-      navigate("/dashboard");
+      navigate("/");
     } catch (err: any) {
       setError(err.response?.data?.message || "Error registering");
     } finally {
@@ -99,6 +99,7 @@ export default function Register() {
             disabled={loading}
           >
             {loading ? "Signing Up..." : "Sign Up"}
+            
           </button>
         </form>
 
