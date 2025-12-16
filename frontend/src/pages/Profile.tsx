@@ -9,6 +9,7 @@ import {
   unfollowUser,
   removeFollower,
 } from "../services/api";
+import LeftSidebar from "../components/feed/LeftSidebar";
 
 export default function Profile() {
   const [profile, setProfile] = useState<any>(null);
@@ -136,22 +137,31 @@ export default function Profile() {
   const { user, stats } = profile;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-10">
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+
+<div className="bg-gray-50 max-w-5xl mx-auto px-6 py-12">
+  <div className="
+    bg-white/70
+    backdrop-blur-xl
+    rounded-3xl
+    border border-gray-200/60
+    px-8 py-10
+    md:px-12
+  ">
 
       {/* ================= HEADER ================= */}
-      <div className="flex items-center gap-8">
+      <div className="flex flex-col sm:flex-row gap-8 items-start sm:items-center">
 
         {/* Avatar */}
-        <div className="relative">
+        <div className="relative group">
   <img
-  src={
-    user.avatar
-      ? `http://localhost:5000/${user.avatar}?t=${Date.now()}`
-      : "/avatar-placeholder.png"
-  }
-  className="w-28 h-28 rounded-full object-cover border"
-/>
-
+    src={
+      user.avatar
+        ? `http://localhost:5000/${user.avatar}?t=${Date.now()}`
+        : "/avatar-placeholder.png"
+    }
+    className="w-28 h-28 rounded-full object-cover border shadow-sm"
+  />
 
   <input
     type="file"
@@ -162,13 +172,15 @@ export default function Profile() {
 
   <button
     onClick={() => fileRef.current?.click()}
-    className="absolute bottom-0 right-0 bg-white text-xs px-2 py-1 rounded-full border shadow"
+    className="
+      absolute inset-0 rounded-full bg-black/40 text-white text-xs
+      opacity-0 group-hover:opacity-100 transition
+      flex items-center justify-center
+    "
   >
-    Edit
+    Change photo
   </button>
 </div>
-
-
 
         {/* Info */}
         <div className="flex-1">
@@ -181,10 +193,26 @@ export default function Profile() {
           ) : (
             <div className="mt-2">
               <textarea
-                value={bio}
-                onChange={e => setBio(e.target.value)}
-                className="w-full border rounded-lg p-2 text-sm"
-              />
+  value={bio}
+  onChange={e => setBio(e.target.value)}
+  rows={3}
+  placeholder="Tell people about yourself…"
+  className="
+    w-full max-w-sm
+    bg-gray-50
+    border border-gray-200
+    rounded-xl
+    px-4 py-3
+    text-sm text-gray-800
+    placeholder-gray-400
+    focus:outline-none
+    focus:bg-white
+    focus:border-purple-500
+    focus:ring-2 focus:ring-purple-500/20
+    transition
+  "
+/>
+
             </div>
           )}
 {editing ? (
@@ -206,41 +234,41 @@ export default function Profile() {
 ) : (
   <button
     onClick={() => setEditingBio(true)}
-    className="mt-4 px-6 py-1.5 rounded-md border text-sm"
+    className="mt-2 px-4 py-1.5 border rounded-full text-sm hover:bg-gray-50"
   >
     Edit Profile
   </button>
 )}
 
-          <div className="flex gap-6 mt-4 text-sm">
-            <span><b>{stats.tips}</b> tips</span>
+ {/* ========= stats =============== */}
+          <div className="flex gap-8 mt-6 text-sm">
+  <div className="text-center">
+    <p className="font-semibold">{stats.tips}</p>
+    <p className="text-gray-500">Tips</p>
+  </div>
 
-            <span
-              onClick={fetchFollowers}
-              className="cursor-pointer hover:underline"
-            >
-              <b>{stats.followers}</b> followers
-            </span>
+  <div
+    onClick={fetchFollowers}
+    className="text-center cursor-pointer hover:opacity-80"
+  >
+    <p className="font-semibold">{stats.followers}</p>
+    <p className="text-gray-500">Followers</p>
+  </div>
 
-            <span
-              onClick={fetchFollowing}
-              className="cursor-pointer hover:underline"
-            >
-              <b>{stats.following}</b> following
-            </span>
-          </div>
-
-          {/* <button
-            onClick={() => setEditingBio(true)}
-            className="mt-4 px-6 py-1.5 rounded-md border text-sm"
-          >
-            Edit Profile
-          </button> */}
+  <div
+    onClick={fetchFollowing}
+    className="text-center cursor-pointer hover:opacity-80"
+  >
+    <p className="font-semibold">{stats.following}</p>
+    <p className="text-gray-500">Following</p>
+  </div>
+</div>  
         </div>
       </div>
+<div className="mt-10 border-t border-gray-200/70" />
 
       {/* ================= TABS ================= */}
-      <div className="flex justify-center gap-10 mt-10 border-t pt-4 text-sm">
+      <div className="flex justify-center gap-10 mt-5 pt-4 text-sm">
         <button
           onClick={() => setTab("tips")}
           className={tab === "tips" ? "font-semibold border-b-2 border-purple-600 pb-2" : ""}
@@ -256,19 +284,32 @@ export default function Profile() {
       </div>
 
       {/* ================= GRID ================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-        {tips.map(tip => (
-          <div
-            key={tip._id}
-            className="border rounded-xl p-4 hover:bg-gray-50 transition"
-          >
-            <h3 className="font-medium text-sm">{tip.title}</h3>
-            <p className="text-xs text-gray-600 mt-1 line-clamp-3">
-              {tip.content}
-            </p>
-          </div>
-        ))}
-      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8
+      ">
+  {tips.map(tip => (
+    <div
+      key={tip._id}
+      className="
+        bg-white/70
+    backdrop-blur-xl
+    rounded-3xl
+    border border-gray-200/60
+    px-8 py-10
+    md:px-12
+        
+      "
+    >
+      <h3 className="font-medium text-sm mb-1">
+        {tip.title}
+      </h3>
+
+      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+        {tip.content}
+      </p>
+    </div>
+  ))}
+</div>
+
 
       {/* ================= FOLLOWERS MODAL ================= */}
       {showFollowers && (
@@ -297,7 +338,9 @@ export default function Profile() {
           ))}
         </Modal>
       )}
+      </div>
     </div>
+   </div>
   );
 }
 
