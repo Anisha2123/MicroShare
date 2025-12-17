@@ -10,7 +10,7 @@ exports.getAllTips = async (req, res) => {
       .populate("comments.replies.user", "name")
       .populate("emojis.user", "name")
       .select(
-        "title content tags attachments createdAt user likes comments emojis"
+        "title content tags attachments createdAt user likes comments emojis bookmarks"
       );
 
    tips.forEach(tip => {

@@ -111,15 +111,18 @@ const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
 
       const bookmarks = tip.bookmarks ?? []; // ✅ normalize
 
-      const isBookmarked = bookmarks.some(
-        (id) => id.toString() === userId
-      );
+      const isBookmarked = tip.bookmarks?.some(
+  (id: any) => String(id) === String(userId)
+);
+
+
 
       return {
         ...tip,
         bookmarks: isBookmarked
-          ? bookmarks.filter((id) => id !== userId)
-          : [...bookmarks, userId],
+  ? bookmarks.filter(id => String(id) !== String(userId))
+  : [...bookmarks, userId]
+,
       };
     })
   );
@@ -217,7 +220,7 @@ const replyToComment = async (
         </aside>
 
         {/* FEED */}
-        {/* FEED */}
+       
 <main className="col-span-12 lg:col-span-6">
   <div className="flex flex-col items-center space-y-6">
     {loading && <p className="text-gray-500 text-center">Loading...</p>}
@@ -226,15 +229,24 @@ const replyToComment = async (
       const date = new Date(tip.createdAt);
       
       const isBookmarked = tip.bookmarks?.some(
-    (id: string) => id.toString() === userId
-     
-  );
+  (id: any) => String(id) === String(userId)
+);
+
   
       return (
         <div
-          key={tip._id}
-          className="w-full bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-        >
+  key={tip._id}
+  className="
+    w-full
+    max-w-[468px]
+    mx-auto
+    bg-white
+    border border-gray-200
+    rounded-none sm:rounded-xl
+    overflow-hidden
+  "
+>
+
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3">
   {/* Left: Avatar + Name */}
@@ -413,9 +425,10 @@ const replyToComment = async (
 </div>
 
 {/* Like count (Instagram style) */}
-<div className="px-4 pb-2 text-sm font-medium text-gray-900">
+<p className="px-4 text-sm font-medium text-gray-900">
   {tip.likes?.length || 0} likes
-</div>
+</p>
+
 
         
 {/* ================= CONTENT ================= */}
@@ -428,24 +441,24 @@ const replyToComment = async (
 
   {/* Caption + Tags */}
   <span
-    className={`inline ${
-      !expanded[tip._id] ? "line-clamp-4" : ""
+    className={` ${
+      !expanded[tip._id] ? "line-clamp-1" : ""
     } leading-snug`}
   >
     {tip.content}
 
     {tip.tags.length > 0 && (
-      <span className="ml-1">
+      <p className="ml-1">
         {tip.tags.map(tag => (
           <button
             key={tag}
             onClick={() => setTag(tag)}
-            className="text-purple-600 hover:text-purple-700 ml-1"
+            className="text-purple-600 hover:text-purple-700 ml-1 lime-clamp-2"
           >
             #{tag}
           </button>
         ))}
-      </span>
+      </p>
     )}
   </span>
 
@@ -458,7 +471,7 @@ const replyToComment = async (
           [tip._id]: !prev[tip._id],
         }))
       }
-      className="block text-gray-400 hover:text-gray-600 mt-0.5"
+      className="block text-gray-400 hover:text-gray-600 text-sm mt-0.5"
     >
       {expanded[tip._id] ? "less" : "more"}
     </button>

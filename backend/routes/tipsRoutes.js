@@ -185,16 +185,9 @@ router.post("/:id/comment", auth, async (req, res) => {
   }
 });
 
-// Bookmark / Unbookmark
-// const express = require("express");
-// const router = express.Router();
-// const Tip = require("../models/Tip");
-// const User = require("../models/User");
-// const auth = require("../middleware/auth");
-
 // Bookmark / Unbookmark (Tip + User sync)
 router.post("/:id/bookmark", auth, async (req, res) => {
-  try {
+  try { 
     console.log("bookmark api hit");
 
     const tipId = req.params.id;
