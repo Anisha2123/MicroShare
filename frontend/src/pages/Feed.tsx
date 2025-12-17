@@ -213,7 +213,7 @@ const replyToComment = async (
 
   return (
     <>
-      <div className="min-h-screen bg-gray-100 py-0">
+      <div className="min-h-screen bg-gray-100 w-full py-0">
         <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
 
         {/* LEFT SIDEBAR */}

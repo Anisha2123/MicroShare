@@ -27,6 +27,8 @@ export default function RightSidebar({
       bg-white
       rounded-2xl
       flex-col
+      gap-5
+      
     "
   >
     {/* 🔝 TOP */}

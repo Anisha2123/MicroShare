@@ -21,7 +21,7 @@ const App = () => {
     <Router>
       <div className="bg-gray-50 min-h-screen text-gray-800">
         {/* Show Navbar only if logged in */}
-        {token && <Navbar />}
+        {/* {token && <Navbar />} */}
 
         <Routes>
           {/* Public Routes */}
@@ -62,7 +62,7 @@ const App = () => {
             }
           />
           {/* Default route */}
-          {/* <Route path="*" element={<Navigate to={token ? "/dashboard" : "/"} replace />} /> */}
+          <Route path="*" element={<Navigate to={token ? "/profile:userId" : "/"} replace />} />
           
         </Routes>
         <MobileBottomNav />

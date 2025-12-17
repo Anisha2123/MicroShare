@@ -10,6 +10,8 @@ import {
 import { NavLink } from "react-router-dom";
 
 export default function ProfileSidebar() {
+
+  const userId = localStorage.getItem("userId")
   return (
     <aside
   className="
@@ -36,7 +38,7 @@ export default function ProfileSidebar() {
         {/* <SidebarItem to="/saved" icon={<Bookmark size={18} />} label="Saved" /> */}
         {/* <SidebarItem to="/followers" icon={<Users size={18} />} label="Followers" /> */}
         {/* <SidebarItem to="/following" icon={<Users size={18} />} label="Following" /> */}
-                <SidebarItem to="/profile" icon={<User size={18} />} label="Profile" />
+                <SidebarItem to={`/profile/${userId}`} icon={<User size={18} />} label="Profile" />
         {/* <SidebarItem to="/settings" icon={<Settings size={18} />} label="Settings" /> */}
       </nav>
 

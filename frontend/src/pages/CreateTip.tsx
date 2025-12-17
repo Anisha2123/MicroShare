@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTip } from "../services/api";
 import { Smile, Image, Paperclip, X } from "lucide-react";
-
+import ProfileSidebar from "../components/ProfileSidebar";
 const MAX_CHARS = 500;
 
 export default function CreateTip() {
@@ -84,7 +84,10 @@ export default function CreateTip() {
 
 
   return (
-   <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
+    <>
+    <ProfileSidebar />
+    <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
+    
   <div className="w-full max-w-100">
 
     {/* Card */}
@@ -248,6 +251,8 @@ export default function CreateTip() {
     </div>
   </div>
 </div>
+    </>
+   
 
 
 
