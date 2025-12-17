@@ -3,10 +3,12 @@ import { getTips } from "../services/api";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import LeftSidebar from "../components/feed/LeftSidebar";
+import ProfileSidebar from "../components/ProfileSidebar";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import RightSidebar from "../components/feed/RightSidebar";
 import {
   Heart,
@@ -216,7 +218,7 @@ const replyToComment = async (
 
         {/* LEFT SIDEBAR */}
         <aside className="col-span-3 hidden lg:block sticky top-14 h-fit ">
-          <LeftSidebar sort={sort} setSort={setSort} setTag={setTag} />
+          <ProfileSidebar  />
         </aside>
 
         {/* FEED */}
@@ -267,9 +269,10 @@ const replyToComment = async (
 
     {/* Name + Time */}
     <div className="flex flex-col leading-tight">
-      <span className="text-sm font-medium text-gray-900">
+      <Link to={`/profile/${(tip.user as any)?._id || tip.user}`} className="text-sm font-medium text-gray-900">
         {tip.user?.name || "Anonymous"}
-      </span>
+      </Link>
+      
 
       <span className="text-[11px] text-gray-400">
         {date.toLocaleDateString("en-IN", {
@@ -506,9 +509,9 @@ const replyToComment = async (
 
             {/* Comment */}
             <p className="text-sm text-gray-900">
-              <span className="font-medium mr-1">
+              <Link to={`/profile/${(c.user as any)?._id || c.user}`} className="font-medium mr-1">
                 {c.user?.name || "user"}
-              </span>
+              </Link>
               {c.content}
             </p>
 
@@ -553,9 +556,9 @@ const replyToComment = async (
               <div className="ml-4 mt-1 space-y-1">
                 {c.replies.map((r: any, idx: number) => (
                   <p key={idx} className="text-xs text-gray-800">
-                    <span className="font-medium mr-1">
+                    <Link to={`/profile/${(r.user as any)?._id || r.user}`} className="font-medium mr-1">
                       {r.user?.name || "user"}
-                    </span>
+                    </Link>
                     {r.content}
                   </p>
                 ))}
@@ -618,9 +621,9 @@ const replyToComment = async (
 
 
         {/* RIGHT SIDEBAR (next step) */}
-        <aside className="col-span-3 hidden lg:block sticky top-14 h-fit ">
+        <aside className="col-span-3 hidden lg:block sticky top-14 h-full ">
           {/* Coming next */}
-          <RightSidebar />
+          <RightSidebar sort={sort} setSort={setSort} setTag={setTag} />
         </aside>
 
       </div>

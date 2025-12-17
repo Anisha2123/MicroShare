@@ -3,7 +3,7 @@ import axios from "axios";
 // import { useParams } from "react-router-dom";
 import ProfileSidebar from "../components/ProfileSidebar";
 // import MobileBottomNav from "../components/MobileBottomNav";
-
+import Row from "../components/Row"
 
 import {
   getFollowers,
@@ -12,6 +12,7 @@ import {
   unfollowUser,
   removeFollower,
 } from "../services/api";
+import { useParams } from "react-router-dom";
 // import LeftSidebar from "../components/feed/LeftSidebar";
 
 export default function Profile() {
@@ -28,9 +29,13 @@ export default function Profile() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId") || "";
+  const {userId} = useParams<{userId: string}>() || "";
+  const loggedInUserId = localStorage.getItem("userId");
 
-
+  const isOwnedProfile = userId == loggedInUserId ;
+  console.log(`profile page opened with userid as ${userId}`)
+  console.log(`loggedInUserId is ${loggedInUserId}`);
+  console.log(isOwnedProfile)
   /* ================= FETCH PROFILE ================= */
   useEffect(() => {
     axios
@@ -199,7 +204,7 @@ const isPdf = (url: string) =>
     ref={fileRef}
     onChange={uploadAvatar}
   />
-
+{isOwnedProfile &&(
   <button
     onClick={() => fileRef.current?.click()}
     className="
@@ -210,90 +215,97 @@ const isPdf = (url: string) =>
   >
     Change photo
   </button>
+  )}
 </div>
 
         {/* Info */}
         <div className="flex-1">
-          <h2 className="text-xl font-semibold">{user.name}</h2>
+  <h2 className="text-xl font-semibold">{user.name}</h2>
 
-          {!editing ? (
-            <p className="text-sm text-gray-500 mt-1">
-              {user.bio || "No bio yet"}
-            </p>
-          ) : (
-            <div className="mt-2">
-              <textarea
-  value={bio}
-  onChange={e => setBio(e.target.value)}
-  rows={3}
-  placeholder="Tell people about yourself…"
-  className="
-    w-full max-w-sm
-    bg-gray-50
-    border border-gray-200
-    rounded-xl
-    px-4 py-3
-    text-sm text-gray-800
-    placeholder-gray-400
-    focus:outline-none
-    focus:bg-white
-    focus:border-purple-500
-    focus:ring-2 focus:ring-purple-500/20
-    transition
-  "
-/>
+  {/* BIO */}
+  
+  {!editing ? (
+    <p className="text-sm text-gray-500 mt-1">
+      {user.bio || "No bio yet"}
+    </p>
+  ) : (
+    <div className="mt-2">
+      <textarea
+        value={bio}
+        onChange={e => setBio(e.target.value)}
+        rows={3}
+        placeholder="Tell people about yourself…"
+        className="
+          w-full max-w-sm
+          bg-gray-50
+          border border-gray-200
+          rounded-xl
+          px-4 py-3
+          text-sm text-gray-800
+          placeholder-gray-400
+          focus:outline-none
+          focus:bg-white
+          focus:border-purple-500
+          focus:ring-2 focus:ring-purple-500/20
+          transition
+        "
+      />
+    </div>
+  )}
 
-            </div>
-          )}
-{editing ? (
-  <div className="flex gap-3 mt-3">
-    <button
-      onClick={handleUpdateProfile}
-      className="px-4 py-1.5 bg-purple-600 text-white rounded-md text-sm"
+  {/* ACTION BUTTONS */}
+  {isOwnedProfile && (
+    editing ? (
+      <div className="flex gap-3 mt-3">
+        <button
+          onClick={handleUpdateProfile}
+          className="px-4 py-1.5 bg-purple-600 text-white rounded-md text-sm"
+        >
+          Update
+        </button>
+
+        <button
+          onClick={() => setEditingBio(false)}
+          className="px-4 py-1.5 border rounded-md text-sm"
+        >
+          Cancel
+        </button>
+      </div>
+    ) : (
+      <button
+        onClick={() => setEditingBio(true)}
+        className="mt-2 px-4 py-1.5 border rounded-full text-sm hover:bg-gray-50"
+      >
+        Edit Profile
+      </button>
+    )
+  )}
+
+  {/* ========= STATS ========== */}
+  <div className="flex gap-8 mt-6 text-sm">
+    <div className="text-center">
+      <p className="font-semibold">{stats.tips}</p>
+      <p className="text-gray-500">Tips</p>
+    </div>
+
+    <div
+      onClick={fetchFollowers}
+      className="text-center cursor-pointer hover:opacity-80"
     >
-      Update
-    </button>
+      <p className="font-semibold">{stats.followers}</p>
+      <p className="text-gray-500">Followers</p>
+    </div>
 
-    <button
-      onClick={() => setEditingBio(false)}
-      className="px-4 py-1.5 border rounded-md text-sm"
+    <div
+      onClick={fetchFollowing}
+      className="text-center cursor-pointer hover:opacity-80"
     >
-      Cancel
-    </button>
+      <p className="font-semibold">{stats.following}</p>
+      <p className="text-gray-500">Following</p>
+    </div>
   </div>
-) : (
-  <button
-    onClick={() => setEditingBio(true)}
-    className="mt-2 px-4 py-1.5 border rounded-full text-sm hover:bg-gray-50"
-  >
-    Edit Profile
-  </button>
-)}
+</div>
 
- {/* ========= stats =============== */}
-          <div className="flex gap-8 mt-6 text-sm">
-  <div className="text-center">
-    <p className="font-semibold">{stats.tips}</p>
-    <p className="text-gray-500">Tips</p>
-  </div>
-
-  <div
-    onClick={fetchFollowers}
-    className="text-center cursor-pointer hover:opacity-80"
-  >
-    <p className="font-semibold">{stats.followers}</p>
-    <p className="text-gray-500">Followers</p>
-  </div>
-
-  <div
-    onClick={fetchFollowing}
-    className="text-center cursor-pointer hover:opacity-80"
-  >
-    <p className="font-semibold">{stats.following}</p>
-    <p className="text-gray-500">Following</p>
-  </div>
-</div>  
-        </div>
       </div>
 <div className="mt-10 border-t border-gray-200/70" />
 
@@ -413,7 +425,8 @@ const isPdf = (url: string) =>
             <Row
               key={u._id}
               user={u}
-              actionLabel="Remove"
+              linkTo={`/profile/${u._id}`}
+              actionLabel={isOwnedProfile ? "Remove" : undefined}
               onAction={() => handleRemoveFollower(u._id)}
             />
           ))}
@@ -427,7 +440,8 @@ const isPdf = (url: string) =>
             <Row
               key={u._id}
               user={u}
-              actionLabel="Unfollow"
+              linkTo={`/profile/${u._id}`}
+              actionLabel={isOwnedProfile ? "Unfollow" : undefined}
               onAction={() => handleUnfollow(u._id)}
             />
           ))}
@@ -460,16 +474,16 @@ function Modal({ title, children, onClose }: any) {
   );
 }
 
-function Row({ user, actionLabel, onAction }: any) {
-  return (
-    <div className="flex justify-between items-center py-2">
-      <span>{user.name}</span>
-      <button
-        onClick={onAction}
-        className="text-sm text-purple-600"
-      >
-        {actionLabel}
-      </button>
-    </div>
-  );
-}
+// function Row({ user, actionLabel, onAction }: any) {
+//   return (
+//     <div className="flex justify-between items-center py-2">
+//       <span>{user.name}</span>
+//       <button
+//         onClick={onAction}
+//         className="text-sm text-purple-600"
+//       >
+//         {actionLabel}
+//       </button>
+//     </div>
+//   );
+// }

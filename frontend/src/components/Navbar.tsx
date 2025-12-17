@@ -5,7 +5,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
-
+  const userId = localStorage.getItem("userId")
   const logout = () => {
     localStorage.clear();
     navigate("/");
@@ -44,7 +44,7 @@ export default function Navbar() {
             Dashboard
           </Link>
           <Link
-            to="/profile"
+            to={`/profile/${userId}`}
             className="hover:text-purple-700 transition"
           >
             Profile

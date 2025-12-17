@@ -11,7 +11,8 @@ import MobileBottomNav from "./components/MobileBottomNav";
 
 const App = () => {
   const token = localStorage.getItem("token");
-  
+  const userId = localStorage.getItem("userId");
+ console.log(`userid is  ok ${userId}`)
   const PrivateRoute = ({ children }: { children: JSX.Element }) => {
     return token ? children : <Navigate to="/" replace />;
   };
@@ -53,7 +54,7 @@ const App = () => {
             }
           />
           <Route
-            path="/profile"
+            path="/profile/:userId"
             element={
               <PrivateRoute>
                 <Profile  />
@@ -61,7 +62,7 @@ const App = () => {
             }
           />
           {/* Default route */}
-          <Route path="*" element={<Navigate to={token ? "/dashboard" : "/"} replace />} />
+          {/* <Route path="*" element={<Navigate to={token ? "/dashboard" : "/"} replace />} /> */}
           
         </Routes>
         <MobileBottomNav />

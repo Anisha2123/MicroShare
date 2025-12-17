@@ -9,7 +9,7 @@ export default function SuggestedUsers() {
   const [showAll, setShowAll] = useState(false);
 
   const token = localStorage.getItem("token");
-
+  
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/users/suggested", {
@@ -34,7 +34,14 @@ export default function SuggestedUsers() {
     setUsers(prev => prev.filter(u => u._id !== id));
   };
 
-  const visibleUsers = showAll ? users : users.slice(0, 3);
+  const shouldShowToggle = users.length > 3;
+
+const visibleUsers = shouldShowToggle
+  ? showAll
+    ? users
+    : users.slice(0, 3)
+  : users; // <= 6 → show all
+
 
   return (
     <div className="space-y-4">
@@ -80,14 +87,15 @@ export default function SuggestedUsers() {
             </div>
           ))}
 
-      {!loading && users.length > 3 && (
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="text-xs text-gray-400 hover:text-gray-600"
-        >
-          {showAll ? "Show less" : "Show more"}
-        </button>
-      )}
+      {!loading && shouldShowToggle && (
+  <button
+    onClick={() => setShowAll(prev => !prev)}
+    className="text-xs text-gray-400 hover:text-gray-600"
+  >
+    {showAll ? "Show less" : "Show more"}
+  </button>
+)}
+
     </div>
   );
 }

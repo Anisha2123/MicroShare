@@ -150,7 +150,8 @@ router.post("/follow/:userId", auth, async (req, res) => {
 router.get("/:userId/saved-tips", auth, async (req, res) => {
   try {
     console.log(`saved-tips api hit`)
-    const user = await User.findById(req.user.id)
+    console.log(req.params.userId)
+    const user = await User.findById(req.params.userId)
       .populate({
         path: "savedTips",
         populate: {

@@ -37,7 +37,7 @@ export default function MobileBottomNav() {
       />
 
       <Item to="/dashboard" icon={<LayoutDashboard size={22} />} />
-      <Item to="/profile" icon={<User size={22} />} />
+      <Item to="/profile/userId" icon={<User size={22} />} />
 
       {/* Logout */}
       <button
