@@ -153,19 +153,31 @@ const isPdf = (url: string) =>
   <main className="transition-all
         px-4 sm:px-6 lg:px-8
         pb-20
-        lg:ml-[260px]">
+        lg:ml-[260px]"> 
     {/* Profile / Feed / Dashboard */}
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
 
 <div className="bg-gray-50 max-w-5xl mx-auto px-6 py-10">
-  <div className="
+  <div
+  className="
     bg-white/70
     backdrop-blur-xl
     rounded-3xl
     border border-gray-200/60
-    px-8 py-10
+
+    w-full
+    max-w-5xl
+
+
+    mx-auto
+    px-8
+    py-6
     md:px-12
-  ">
+
+    flex
+    flex-col
+  "
+>
 
       {/* ================= HEADER ================= */}
       <div className="flex flex-col sm:flex-row gap-8 items-start sm:items-center">
@@ -302,104 +314,125 @@ const isPdf = (url: string) =>
       </div>
 
       {/* ================= GRID ================= */}
-     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+     <div className="
+  grid
+  grid-cols-1
+  md:grid-cols-2
+  gap-8
+  mt-10
+  justify-items-center
+">
+
+
   {tips.map(tip => {
     const images = tip.attachments.filter(isImage);
     const files = tip.attachments.filter(a => !isImage(a));
 
     return (
-      <article
-        key={tip._id}
-        className="
-          bg-white
-          rounded-2xl
-          border border-gray-200
-          overflow-hidden
-          hover:shadow-lg
-          transition
-        "
-      >
+     <article
+  key={tip._id}
+  className="
+    bg-white
+    rounded-2xl
+    border border-gray-200
+    overflow-hidden
+    transition
+    hover:shadow-xl
+
+    w-[360px]
+    sm:w-[400px]
+    lg:w-[380px]
+
+    h-[420px]
+    flex
+    flex-col
+  "
+>
+
         {/* ========== IMAGE PREVIEW ========== */}
         {images.length > 0 && (
-          <div className="relative">
-            <img
-              src={`http://localhost:5000${images[0]}`}
-              alt="attachment"
-              className="w-full h-56 object-cover"
-              loading="lazy"
-            />
+  <div className="relative h-[200px] shrink-0">
+    <img
+      src={`http://localhost:5000${images[0]}`}
+      alt="attachment"
+      className="w-full h-full object-cover"
+      loading="lazy"
+    />
 
-            {images.length > 1 && (
-              <span className="absolute top-3 right-3 text-xs px-2 py-0.5 rounded-full bg-black/70 text-white">
-                +{images.length - 1}
-              </span>
-            )}
-          </div>
-        )}
+    {images.length > 1 && (
+      <span className="absolute top-3 right-3 text-xs px-2 py-0.5 rounded-full bg-black/70 text-white">
+        +{images.length - 1}
+      </span>
+    )}
+  </div>
+)}
+
 
         {/* ========== CONTENT ========== */}
-        <div className="p-5">
+        <div className="p-5 flex flex-col flex-1">
           {/* Title + Date */}
           <div className="flex items-start justify-between gap-4">
-            <h3 className="font-semibold text-sm text-gray-900 line-clamp-1">
-              {tip.title}
-            </h3>
-            <span className="text-xs text-gray-400 whitespace-nowrap">
-              {new Date(tip.createdAt).toLocaleDateString()}
-            </span>
-          </div>
+  <h3 className="font-semibold text-sm text-gray-900 line-clamp-1">
+    {tip.title}
+  </h3>
+  <span className="text-xs text-gray-400 whitespace-nowrap">
+    {new Date(tip.createdAt).toLocaleDateString()}
+  </span>
+</div>
+
 
           {/* Content */}
-          <p className="text-sm text-gray-600 leading-relaxed mt-2 line-clamp-3">
+          <p className="text-sm text-gray-600 leading-relaxed mt-2 line-clamp-2">
             {tip.content}
           </p>
 
           {/* ========== DOCUMENT ATTACHMENTS ========== */}
           {files.length > 0 && (
-            <div className="mt-4 space-y-2">
-              {files.map((file: string) => (
-                <a
-                  key={file}
-                  href={`http://localhost:5000${file}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="
-                    flex items-center gap-3
-                    p-3 rounded-xl
-                    border border-gray-200
-                    hover:bg-gray-50
-                    transition
-                  "
-                >
-                  <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center text-sm">
-                    📄
-                  </div>
+  <div className="mt-4 space-y-2 max-h-[90px] overflow-hidden">
+    {files.slice(0, 1).map((file: string) => (
+      <a
+        key={file}
+        href={`http://localhost:5000${file}`}
+        target="_blank"
+        rel="noreferrer"
+        className="
+          flex items-center gap-3
+          p-3 rounded-xl
+          border border-gray-200
+          hover:bg-gray-50
+          transition
+          mb-5
+        "
+      >
+        <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center text-sm">
+          📄
+        </div>
 
-                  <div className="flex-1 overflow-hidden">
-                    <p className="text-sm font-medium text-gray-800 truncate">
-                      {file.split("/").pop()}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      PDF Document
-                    </p>
-                  </div>
-                </a>
-              ))}
-            </div>
-          )}
+        <div className="flex-1 overflow-hidden">
+          <p className="text-sm font-medium text-gray-800 truncate">
+            {file.split('/').pop()}
+          </p>
+          <p className="text-xs text-gray-500">Document</p>
+        </div>
+      </a>
+    ))}
+  </div>
+)}
+
 
           {/* ========== FOOTER ========== */}
-          <div className="flex items-center justify-between mt-5 pt-4 border-t">
-            <div className="flex items-center gap-5 text-xs text-gray-500">
-              <span>❤️ {tip.likesCount}</span>
-              <span>💬 {tip.commentsCount}</span>
-              <span>🔖 {tip.bookmarks?.length || 0}</span>
-            </div>
+          <div className="mt-auto pt-4 border-t flex items-center justify-between">
+  <div className="flex items-center gap-5 text-xs text-gray-500">
+    <span>❤️ {tip.likesCount}</span>
+    <span>💬 {tip.commentsCount}</span>
+    <span>🔖 {tip.bookmarks?.length || 0}</span>
+  </div>
 
-            <button className="text-xs font-medium text-purple-600 hover:underline">
-              View
-            </button>
-          </div>
+  <button className="text-xs font-medium text-purple-600 hover:underline">
+    View
+  </button>
+</div>
+
         </div>
       </article>
     );
