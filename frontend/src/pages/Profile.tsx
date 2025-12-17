@@ -315,129 +315,92 @@ const isPdf = (url: string) =>
 
       {/* ================= GRID ================= */}
      <div className="
-  grid
-  grid-cols-1
-  md:grid-cols-2
-  gap-8
+  columns-2
+  sm:columns-3
+  md:columns-4
+  lg:columns-5
+  gap-3
   mt-10
-  justify-items-center
 ">
-
-
   {tips.map(tip => {
     const images = tip.attachments.filter(isImage);
-    const files = tip.attachments.filter(a => !isImage(a));
+    if (images.length === 0) return null;
 
     return (
-     <article
-  key={tip._id}
-  className="
-    bg-white
-    rounded-2xl
-    border border-gray-200
-    overflow-hidden
-    transition
-    hover:shadow-xl
-
-    w-[360px]
-    sm:w-[400px]
-    lg:w-[380px]
-
-    h-[420px]
-    flex
-    flex-col
-  "
->
-
-        {/* ========== IMAGE PREVIEW ========== */}
-        {images.length > 0 && (
-  <div className="relative h-[200px] shrink-0">
-    <img
-      src={`http://localhost:5000${images[0]}`}
-      alt="attachment"
-      className="w-full h-full object-cover"
-      loading="lazy"
-    />
-
-    {images.length > 1 && (
-      <span className="absolute top-3 right-3 text-xs px-2 py-0.5 rounded-full bg-black/70 text-white">
-        +{images.length - 1}
-      </span>
-    )}
-  </div>
-)}
-
-
-        {/* ========== CONTENT ========== */}
-        <div className="p-5 flex flex-col flex-1">
-          {/* Title + Date */}
-          <div className="flex items-start justify-between gap-4">
-  <h3 className="font-semibold text-sm text-gray-900 line-clamp-1">
-    {tip.title}
-  </h3>
-  <span className="text-xs text-gray-400 whitespace-nowrap">
-    {new Date(tip.createdAt).toLocaleDateString()}
-  </span>
-</div>
-
-
-          {/* Content */}
-          <p className="text-sm text-gray-600 leading-relaxed mt-2 line-clamp-2">
-            {tip.content}
-          </p>
-
-          {/* ========== DOCUMENT ATTACHMENTS ========== */}
-          {files.length > 0 && (
-  <div className="mt-4 space-y-2 max-h-[90px] overflow-hidden">
-    {files.slice(0, 1).map((file: string) => (
-      <a
-        key={file}
-        href={`http://localhost:5000${file}`}
-        target="_blank"
-        rel="noreferrer"
+      <div
+        key={tip._id}
         className="
-          flex items-center gap-3
-          p-3 rounded-xl
-          border border-gray-200
-          hover:bg-gray-50
-          transition
-          mb-5
+          mb-3
+          break-inside-avoid
+          relative
+          overflow-hidden
+          rounded-xl
+          bg-gray-100
+          group
+          cursor-pointer
         "
       >
-        <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center text-sm">
-          📄
+        <img
+          src={`http://localhost:5000${images[0]}`}
+          alt="post"
+          loading="lazy"
+          className="
+            w-full
+            h-auto
+            object-cover
+            transition-transform
+            duration-300
+            group-hover:scale-105
+          "
+        />
+
+        {/* Multiple image badge */}
+        {images.length > 1 && (
+          <span className="
+  absolute top-2 right-2
+  flex items-center justify-center
+  w-6 h-6
+  rounded-md
+  bg-black/60
+  backdrop-blur-sm
+">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="white"
+    className="w-3.5 h-3.5"
+  >
+    <path d="M16 1H6a2 2 0 00-2 2v12h2V3h10V1z" />
+    <path d="M18 5H10a2 2 0 00-2 2v14a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2z" />
+  </svg>
+</span>
+
+        )}
+
+        {/* Hover overlay */}
+        <div className="
+          absolute inset-0
+          bg-black/40
+          opacity-0
+          group-hover:opacity-100
+          transition
+          flex
+          items-center
+          justify-center
+          gap-6
+          text-white
+          text-sm
+          font-medium
+        ">
+          <span>❤️ {tip.likesCount}</span>
+          <span>💬 {tip.commentsCount}</span>
         </div>
-
-        <div className="flex-1 overflow-hidden">
-          <p className="text-sm font-medium text-gray-800 truncate">
-            {file.split('/').pop()}
-          </p>
-          <p className="text-xs text-gray-500">Document</p>
-        </div>
-      </a>
-    ))}
-  </div>
-)}
-
-
-          {/* ========== FOOTER ========== */}
-          <div className="mt-auto pt-4 border-t flex items-center justify-between">
-  <div className="flex items-center gap-5 text-xs text-gray-500">
-    <span>❤️ {tip.likesCount}</span>
-    <span>💬 {tip.commentsCount}</span>
-    <span>🔖 {tip.bookmarks?.length || 0}</span>
-  </div>
-
-  <button className="text-xs font-medium text-purple-600 hover:underline">
-    View
-  </button>
-</div>
-
-        </div>
-      </article>
+      </div>
     );
   })}
 </div>
+
+
 
 
 

@@ -42,35 +42,46 @@ export default function CreateTip() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
+  setError("");
 
-    if (!form.title || !form.content) {
-      setError("Title and content are required");
-      return;
-    }
+  if (!form.title || !form.content) {
+    setError("Title and content are required");
+    return;
+  }
 
-    const formData = new FormData();
-    formData.append("title", form.title);
-    formData.append("content", form.content);
-    formData.append("visibility", form.visibility);
-    tagsArray.forEach(tag => formData.append("tags[]", tag));
+  // ✅ CHECK: At least 1 image is required
+  const imageFiles = attachments.filter(file =>
+    file.type.startsWith("image/")
+  );
 
-    attachments.forEach(file => {
-  formData.append("attachments", file);
-});
+  if (imageFiles.length === 0) {
+    setError("Please upload at least one image to publish the Tip");
+    return;
+  }
 
+  const formData = new FormData();
+  formData.append("title", form.title);
+  formData.append("content", form.content);
+  formData.append("visibility", form.visibility);
 
-    setLoading(true);
-    try {
-      await createTip(formData);
-      navigate("/feed");
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Failed to create tip");
-    } finally {
-      setLoading(false);
-    }
-  };
+  tagsArray.forEach(tag => formData.append("tags[]", tag));
+
+  attachments.forEach(file => {
+    formData.append("attachments", file);
+  });
+
+  setLoading(true);
+  try {
+    await createTip(formData);
+    navigate("/feed");
+  } catch (err: any) {
+    setError(err.response?.data?.message || "Failed to create tip");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
    <div className="min-h-screen bg-gray-50 flex justify-center px-4 py-10">
