@@ -8,7 +8,7 @@ export default function Navbar() {
 
   const logout = () => {
     localStorage.clear();
-    navigate("/login");
+    navigate("/");
   };
 
   return (
@@ -56,7 +56,7 @@ export default function Navbar() {
           {!token ? (
             <>
               <Link
-                to="/login"
+                to="/"
                 className="text-gray-600 hover:text-purple-700 transition"
               >
                 Login
@@ -142,7 +142,7 @@ export default function Navbar() {
               {!token ? (
                 <>
                   <Link
-                    to="/login"
+                    to="/"
                     onClick={() => setOpen(false)}
                     className="hover:text-purple-700"
                   >

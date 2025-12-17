@@ -167,13 +167,18 @@ router.post("/:id/emoji", auth, async (req, res) => {
 
 // Add Comment
 router.post("/:id/comment", auth, async (req, res) => {
+  console.log(`comment api hit`)
   try {
     const { content } = req.body;
     const tip = await Tip.findById(req.params.id);
     if (!tip) return res.status(404).json({ message: "Tip not found" });
 
     tip.comments.push({ content, user: req.user.id });
+    console.log(tip.commentsCount)
+    tip.commentsCount++;
     await tip.save();
+    
+    console.log(tip.commentsCount)
     res.json(tip);
   } catch (err) {
     res.status(500).json({ message: "Server error" });
@@ -181,23 +186,69 @@ router.post("/:id/comment", auth, async (req, res) => {
 });
 
 // Bookmark / Unbookmark
+// const express = require("express");
+// const router = express.Router();
+// const Tip = require("../models/Tip");
+// const User = require("../models/User");
+// const auth = require("../middleware/auth");
+
+// Bookmark / Unbookmark (Tip + User sync)
 router.post("/:id/bookmark", auth, async (req, res) => {
   try {
-    const tip = await Tip.findById(req.params.id);
-    if (!tip) return res.status(404).json({ message: "Tip not found" });
+    console.log("bookmark api hit");
 
-    const index = tip.bookmarks.indexOf(req.user.id);
-    if (index === -1) {
-      tip.bookmarks.push(req.user.id);
-    } else {
-      tip.bookmarks.splice(index, 1);
+    const tipId = req.params.id;
+    const userId = req.user.id;
+
+    const tip = await Tip.findById(tipId);
+    if (!tip) {
+      return res.status(404).json({ message: "Tip not found" });
     }
-    await tip.save();
-    res.json(tip);
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const alreadyBookmarked = tip.bookmarks.some(
+      (id) => id.toString() === userId
+    );
+
+    if (alreadyBookmarked) {
+      // ❌ remove bookmark
+      tip.bookmarks = tip.bookmarks.filter(
+        (id) => id.toString() !== userId
+      );
+
+      user.savedTips = user.savedTips.filter(
+        (id) => id.toString() !== tipId
+      );
+    } else {
+      // ✅ add bookmark
+      tip.bookmarks.push(userId);
+
+      if (!user.savedTips.includes(tipId)) {
+        user.savedTips.push(tipId);
+      }
+    }
+
+    await Promise.all([tip.save(), user.save()]);
+
+    res.json({
+      tipId,
+      bookmarked: !alreadyBookmarked,
+      bookmarksCount: tip.bookmarks.length,
+      savedTipsCount: user.savedTips.length,
+    });
   } catch (err) {
+    console.error("Bookmark error:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
+module.exports = router;
+
+
 
 // routes/tipsRoutes.js
 router.post("/:id/share", auth, async (req, res) => {
@@ -261,12 +312,12 @@ router.post("/:tipId/comment/:commentId/reply",
       if (!comment) {
         return res.status(404).json({ message: "Comment not found" });
       }
-
+      
       comment.replies.push({
         user: req.user.id,
         content,
       });
-
+      tip.commentsCount++;
       await tip.save();
 
       res.status(201).json({

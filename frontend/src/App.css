@@ -235,3 +235,8 @@
 .animate-heart {
   animation: heartPop 0.8s ease-out forwards;
 }
+
+/* ========== mobilesidebar ============ */
+aside::-webkit-scrollbar {
+  display: none;
+}

@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+// import { useParams } from "react-router-dom";
 import ProfileSidebar from "../components/ProfileSidebar";
+// import MobileBottomNav from "../components/MobileBottomNav";
+
 
 import {
   getFollowers,
@@ -10,7 +12,7 @@ import {
   unfollowUser,
   removeFollower,
 } from "../services/api";
-import LeftSidebar from "../components/feed/LeftSidebar";
+// import LeftSidebar from "../components/feed/LeftSidebar";
 
 export default function Profile() {
   const [profile, setProfile] = useState<any>(null);
@@ -129,7 +131,12 @@ export default function Profile() {
   setProfile(res.data);
 };
 
-  
+  const isImage = (url: string) =>
+  /\.(jpg|jpeg|png|webp|gif)$/i.test(url);
+
+const isPdf = (url: string) =>
+  /\.pdf$/i.test(url);
+
 
 
 
@@ -143,7 +150,10 @@ export default function Profile() {
   <ProfileSidebar />
 
   {/* Main Content */}
-  <main className="flex-1 ml-[260px] px-8">
+  <main className="transition-all
+        px-4 sm:px-6 lg:px-8
+        pb-20
+        lg:ml-[260px]">
     {/* Profile / Feed / Dashboard */}
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
 
@@ -292,31 +302,112 @@ export default function Profile() {
       </div>
 
       {/* ================= GRID ================= */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8
-      ">
-  {tips.map(tip => (
-    <div
-      key={tip._id}
-      className="
-        bg-white/70
-    backdrop-blur-xl
-    rounded-3xl
-    border border-gray-200/60
-    px-8 py-10
-    md:px-12
-        
-      "
-    >
-      <h3 className="font-medium text-sm mb-1">
-        {tip.title}
-      </h3>
+     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+  {tips.map(tip => {
+    const images = tip.attachments.filter(isImage);
+    const files = tip.attachments.filter(a => !isImage(a));
 
-      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
-        {tip.content}
-      </p>
-    </div>
-  ))}
+    return (
+      <article
+        key={tip._id}
+        className="
+          bg-white
+          rounded-2xl
+          border border-gray-200
+          overflow-hidden
+          hover:shadow-lg
+          transition
+        "
+      >
+        {/* ========== IMAGE PREVIEW ========== */}
+        {images.length > 0 && (
+          <div className="relative">
+            <img
+              src={`http://localhost:5000${images[0]}`}
+              alt="attachment"
+              className="w-full h-56 object-cover"
+              loading="lazy"
+            />
+
+            {images.length > 1 && (
+              <span className="absolute top-3 right-3 text-xs px-2 py-0.5 rounded-full bg-black/70 text-white">
+                +{images.length - 1}
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* ========== CONTENT ========== */}
+        <div className="p-5">
+          {/* Title + Date */}
+          <div className="flex items-start justify-between gap-4">
+            <h3 className="font-semibold text-sm text-gray-900 line-clamp-1">
+              {tip.title}
+            </h3>
+            <span className="text-xs text-gray-400 whitespace-nowrap">
+              {new Date(tip.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+
+          {/* Content */}
+          <p className="text-sm text-gray-600 leading-relaxed mt-2 line-clamp-3">
+            {tip.content}
+          </p>
+
+          {/* ========== DOCUMENT ATTACHMENTS ========== */}
+          {files.length > 0 && (
+            <div className="mt-4 space-y-2">
+              {files.map((file: string) => (
+                <a
+                  key={file}
+                  href={`http://localhost:5000${file}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="
+                    flex items-center gap-3
+                    p-3 rounded-xl
+                    border border-gray-200
+                    hover:bg-gray-50
+                    transition
+                  "
+                >
+                  <div className="w-9 h-9 rounded-lg bg-purple-100 flex items-center justify-center text-sm">
+                    📄
+                  </div>
+
+                  <div className="flex-1 overflow-hidden">
+                    <p className="text-sm font-medium text-gray-800 truncate">
+                      {file.split("/").pop()}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      PDF Document
+                    </p>
+                  </div>
+                </a>
+              ))}
+            </div>
+          )}
+
+          {/* ========== FOOTER ========== */}
+          <div className="flex items-center justify-between mt-5 pt-4 border-t">
+            <div className="flex items-center gap-5 text-xs text-gray-500">
+              <span>❤️ {tip.likesCount}</span>
+              <span>💬 {tip.commentsCount}</span>
+              <span>🔖 {tip.bookmarks?.length || 0}</span>
+            </div>
+
+            <button className="text-xs font-medium text-purple-600 hover:underline">
+              View
+            </button>
+          </div>
+        </div>
+      </article>
+    );
+  })}
 </div>
+
+
+
 
 
       {/* ================= FOLLOWERS MODAL ================= */}
@@ -350,6 +441,8 @@ export default function Profile() {
     </div>
    </div>
   </main>
+
+   
 </div>
     
   );

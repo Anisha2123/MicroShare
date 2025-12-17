@@ -26,9 +26,9 @@ interface Tip {
   createdAt: string;
   user?: { name: string };
   likes?: string[];
-  emojis?: { emoji: string; user?: { name: string } }[];
-  comments?: { content: string; user?: { name: string } }[];
-  bookmarks?: string[];
+  // emojis?: { emoji: string; user?: { name: string } }[];
+  comments: { content: string; user?: { name: string } }[];
+  bookmarks: string[];
 }
 
 export default function Feed() {
@@ -51,7 +51,7 @@ const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
 
 
   const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId");
+  const userId = localStorage.getItem("userId") ?? "";
 
   const fetchTips = async () => {
     const res = await getTips();
@@ -103,24 +103,43 @@ const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
   lastTap.current[tipId] = now;
 };
 
+  
+  const bookmarkTip = async (tipId: string) => {
+  setTips((prev: Tip[]) =>
+    prev.map((tip) => {
+      if (tip._id !== tipId) return tip;
 
-  const bookmarkTip = async (id: string) => {
+      const bookmarks = tip.bookmarks ?? []; // ✅ normalize
+
+      const isBookmarked = bookmarks.some(
+        (id) => id.toString() === userId
+      );
+
+      return {
+        ...tip,
+        bookmarks: isBookmarked
+          ? bookmarks.filter((id) => id !== userId)
+          : [...bookmarks, userId],
+      };
+    })
+  );
+
+  try {
     await axios.post(
-      `http://localhost:5000/api/tip/${id}/bookmark`,
+      `http://localhost:5000/api/tip/${tipId}/bookmark`,
       {},
-      { headers: { Authorization: `Bearer ${token}` } }
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
     );
-    fetchTips();
-  };
+  } catch {
+    fetchTips(); // rollback on failure
+  }
+};
 
-  const addEmoji = async (id: string, emoji: string) => {
-    await axios.post(
-      `http://localhost:5000/api/tip/${id}/emoji`,
-      { emoji },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    fetchTips();
-  };
+
+
+
 
   const addComment = async (id: string, content: string) => {
     if (!content.trim()) return;
@@ -205,7 +224,12 @@ const replyToComment = async (
 
     {tips.map((tip) => {
       const date = new Date(tip.createdAt);
-
+      
+      const isBookmarked = tip.bookmarks?.some(
+    (id: string) => id.toString() === userId
+     
+  );
+  
       return (
         <div
           key={tip._id}
@@ -366,13 +390,14 @@ const replyToComment = async (
       className="hover:text-purple-600 transition"
     >
       <Bookmark
-        size={22}
-        className={
-          tip.bookmarks?.includes(userId || "")
-            ? "fill-purple-600 text-purple-600"
-            : "text-gray-700"
-        }
-      />
+  size={22}
+  className={
+    isBookmarked
+      ? "fill-purple-600 text-purple-600"
+      : "text-gray-700"
+  }
+/>
+
     </button>
 
     <button

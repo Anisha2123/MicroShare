@@ -12,14 +12,16 @@ import { NavLink } from "react-router-dom";
 export default function ProfileSidebar() {
   return (
     <aside
-      className="
-        fixed left-0 top-0 h-screen w-[260px]
-        bg-white/80 backdrop-blur-xl
-        border-r border-gray-200/60
-        px-6 py-8
-        flex flex-col
-      "
-    >
+  className="
+    hidden lg:flex
+    fixed left-0 top-0 h-screen w-[260px]
+    bg-white/80 backdrop-blur-xl
+    border-r border-gray-200/60
+    px-6 py-8
+    flex-col
+  "
+>
+
       {/* Logo / App Name */}
       <div className="mb-10">
         <h1 className="text-xl font-semibold tracking-tight">
@@ -43,7 +45,7 @@ export default function ProfileSidebar() {
         <button
           onClick={() => {
             localStorage.clear();
-            window.location.href = "/login";
+            window.location.href = "/";
           }}
           className="
             flex items-center gap-3 w-full
