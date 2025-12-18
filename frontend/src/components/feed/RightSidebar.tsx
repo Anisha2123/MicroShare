@@ -21,13 +21,13 @@ export default function RightSidebar({
     className="
       hidden xl:flex
       w-80
-      sticky top-14
-      h-[calc(100vh-3.5rem)]
+      sticky top-0
+      h-screen
       py-6 px-4
       bg-white
       rounded-2xl
       flex-col
-      gap-5
+      gap-0
       
     "
   >

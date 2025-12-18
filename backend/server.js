@@ -14,6 +14,17 @@ app.use(express.json());
 
 const path = require("path");
 
+// ✅ TEST ROUTE
+app.get("/api", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Backend is running",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+
+
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 
@@ -27,5 +38,6 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch(err => console.log(err));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(process.env.PORT || 5000, "0.0.0.0", () => {
+  console.log("Server running on port 5000");
+});

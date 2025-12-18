@@ -34,12 +34,12 @@ export default function SuggestedUsers() {
     setUsers(prev => prev.filter(u => u._id !== id));
   };
 
-  const shouldShowToggle = users.length > 3;
+  const shouldShowToggle = users.length > 5;
 
 const visibleUsers = shouldShowToggle
   ? showAll
     ? users
-    : users.slice(0, 3)
+    : users.slice(0, 5)
   : users; // <= 6 → show all
 
 

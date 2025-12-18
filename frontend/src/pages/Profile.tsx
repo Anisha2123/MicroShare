@@ -29,11 +29,15 @@ export default function Profile() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const token = localStorage.getItem("token");
-  const {userId} = useParams<{userId: string}>() || "";
+  const {userId} = useParams<{userId: string}>() ;
   const loggedInUserId = localStorage.getItem("userId");
 
   const isOwnedProfile = userId == loggedInUserId ;
   console.log(`profile page opened with userid as ${userId}`)
+  if (!userId) {
+  return <div>User not found</div>;
+}
+
   console.log(`loggedInUserId is ${loggedInUserId}`);
   console.log(isOwnedProfile)
   /* ================= FETCH PROFILE ================= */

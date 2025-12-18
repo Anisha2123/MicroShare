@@ -7,6 +7,7 @@ import CreateTip from "./pages/CreateTip";
 import Navbar from "./components/Navbar";
 import Profile from "./pages/Profile";
 import MobileBottomNav from "./components/MobileBottomNav";
+import type { JSX } from "react";
 
 
 const App = () => {
