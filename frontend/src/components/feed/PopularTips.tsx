@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import { API_URL } from "../../services/api";
 export default function PopularTips() {
   const [tips, setTips] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/tip/popular").then(res => setTips(res.data));
+    axios.get(`${API_URL}/tip/popular`).then(res => setTips(res.data));
   }, []);
 
   return (

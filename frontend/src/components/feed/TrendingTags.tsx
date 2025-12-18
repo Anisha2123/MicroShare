@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import { API_URL } from "../../services/api";
 type Tag = {
   _id: string;
   count: number;
@@ -18,7 +18,7 @@ export default function TrendingTags({ onSelect }: any) {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`http://localhost:5000/api/tip/trending/tags?range=${range}`, {
+      .get(`${API_URL}/tip/trending/tags?range=${range}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => setTags(res.data))

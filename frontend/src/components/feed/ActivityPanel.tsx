@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-
+import { API_URL } from "../../services/api";
 export default function ActivityPanel() {
   const [activity, setActivity] = useState([]);
     const token = localStorage.getItem("token");
-    
+
   useEffect(() => {
-    axios.get("http://localhost:5000/api/activity",{
+    axios.get(`${API_URL}/activity`,{
         headers:{
             Authorization:`Bearer ${token}`,
         }

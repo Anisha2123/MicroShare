@@ -9,7 +9,21 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const userRoutes = require("./routes/userRoutes");
 
 const app = express();
-app.use(cors());
+
+
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? ["http://birla-tech-bucket.s3-website.eu-north-1.amazonaws.com"]
+    : ["http://localhost:5173"];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
+
+
 app.use(express.json());
 
 const path = require("path");

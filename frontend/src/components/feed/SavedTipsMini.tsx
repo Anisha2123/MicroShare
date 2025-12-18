@@ -1,12 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-
+import { API_URL } from "../../services/api";
 export default function SavedTipsMini() {
   const [tips, setTips] = useState([]);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    axios.get("http://localhost:5000/api/tip/saved/mini",{
+    axios.get(`${API_URL}/tip/saved/mini`,{
       headers:{
         Authorization: `Bearer ${token}`,
       }

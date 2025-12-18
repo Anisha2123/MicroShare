@@ -2,17 +2,18 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { SuggestedUserSkeleton } from "./SuggestedUserSkeletion";
+import { API_URL } from "../../services/api";
 
 export default function SuggestedUsers() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
-
+  
   const token = localStorage.getItem("token");
   
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/users/suggested", {
+      .get(`${API_URL}/users/suggested`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -25,7 +26,7 @@ export default function SuggestedUsers() {
 
   const followUser = async (id: string) => {
     await axios.post(
-      `http://localhost:5000/api/users/follow/${id}`,
+      `${API_URL}/users/follow/${id}`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );

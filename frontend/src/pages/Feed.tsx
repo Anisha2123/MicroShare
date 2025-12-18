@@ -18,6 +18,7 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import "../App.css"
+import { API_URL } from "../services/api";
 
 interface Tip {
   _id: string;
@@ -84,7 +85,7 @@ const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
 
   const likeTip = async (id: string) => {
     await axios.post(
-      `http://localhost:5000/api/tip/${id}/like`,
+      `${API_URL}/tip/${id}/like`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -131,7 +132,7 @@ const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
 
   try {
     await axios.post(
-      `http://localhost:5000/api/tip/${tipId}/bookmark`,
+      `${API_URL}/tip/${tipId}/bookmark`,
       {},
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -149,7 +150,7 @@ const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
   const addComment = async (id: string, content: string) => {
     if (!content.trim()) return;
     await axios.post(
-      `http://localhost:5000/api/tip/${id}/comment`,
+      `${API_URL}/tip/${id}/comment`,
       { content },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -158,7 +159,7 @@ const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
 
   const shareTip = async (tipId: string) => {
   const res = await axios.post(
-    `http://localhost:5000/api/tip/${tipId}/share`,
+    `${API_URL}/tip/${tipId}/share`,
     {},
     { headers: { Authorization: `Bearer ${token}` } }
   );
@@ -169,7 +170,7 @@ const [openReplies, setOpenReplies] = useState<Record<string, boolean>>({});
 
 const forwardTip = async (tipId: string, receiverId: string) => {
   await axios.post(
-    `http://localhost:5000/api/tip/${tipId}/forward`,
+    `${API_URL}/tip/${tipId}/forward`,
     { receiverId },
     { headers: { Authorization: `Bearer ${token}` } }
   );
@@ -182,7 +183,7 @@ const addCommentEmoji = async (
   emoji: string
 ) => {
   await axios.post(
-    `http://localhost:5000/api/tip/${tipId}/comment/${commentId}/emoji`,
+    `${API_URL}/tip/${tipId}/comment/${commentId}/emoji`,
     { emoji },
     { headers: { Authorization: `Bearer ${token}` } }
   );
@@ -197,7 +198,7 @@ const replyToComment = async (
   if (!content.trim()) return;
 
   await axios.post(
-    `http://localhost:5000/api/tip/${tipId}/comment/${commentId}/reply`,
+    `${API_URL}/tip/${tipId}/comment/${commentId}/reply`,
     { content },
     { headers: { Authorization: `Bearer ${token}` } }
   );

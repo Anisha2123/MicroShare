@@ -14,6 +14,7 @@ import {
 } from "../services/api";
 import { useParams } from "react-router-dom";
 // import LeftSidebar from "../components/feed/LeftSidebar";
+import { API_URL } from "../services/api";
 
 export default function Profile() {
   const [profile, setProfile] = useState<any>(null);
@@ -43,7 +44,7 @@ export default function Profile() {
   /* ================= FETCH PROFILE ================= */
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/users/profile/${userId}`, {
+      .get(`${API_URL}/users/profile/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(res => {
@@ -56,7 +57,7 @@ export default function Profile() {
   useEffect(() => {
     if (tab === "tips") {
       axios
-        .get(`http://localhost:5000/api/users/profile/${userId}/tips`, {
+        .get(`${API_URL}/users/profile/${userId}/tips`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then(res => setTips(res.data));
@@ -64,7 +65,7 @@ export default function Profile() {
 
     if (tab === "saved") {
       axios
-        .get(`http://localhost:5000/api/users/${userId}/saved-tips`, {
+        .get(`${API_URL}/users/${userId}/saved-tips`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then(res => setTips(res.data));
@@ -76,7 +77,7 @@ export default function Profile() {
     const fd = new FormData();
     fd.append("avatar", e.target.files[0]);
 
-    const res = await axios.patch("http://localhost:5000/api/users/avatar", fd, {
+    const res = await axios.patch(`${API_URL}/users/avatar`, fd, {
       headers: { Authorization: `Bearer ${token}`,
     "Content-Type": "multipart/form-data", },
       
@@ -112,7 +113,7 @@ export default function Profile() {
     await unfollowUser(id);
     fetchFollowing();
     // Refresh profile
-  const res = await axios.get(`http://localhost:5000/api/users/profile/${userId}`, {
+  const res = await axios.get(`${API_URL}/users/profile/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   setProfile(res.data);
@@ -123,7 +124,7 @@ export default function Profile() {
     await removeFollower(id);
     fetchFollowers();
     // Refresh profile
-  const res = await axios.get(`http://localhost:5000/api/users/profile/${userId}`, {
+  const res = await axios.get(`${API_URL}/users/profile/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   setProfile(res.data);
@@ -134,7 +135,7 @@ export default function Profile() {
   setEditingBio(false);
 
   // Refresh profile
-  const res = await axios.get(`http://localhost:5000/api/users/profile/${userId}`, {
+  const res = await axios.get(`${API_URL}/users/profile/${userId}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   setProfile(res.data);

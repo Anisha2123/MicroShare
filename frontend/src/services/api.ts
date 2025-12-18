@@ -1,13 +1,15 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5000/api";
+export const API_URL = import.meta.env.VITE_API_BASE_URL;
 
+/* AUTH */
 export const register = (data: { name: string; email: string; password: string }) =>
   axios.post(`${API_URL}/auth/register`, data);
 
 export const login = (data: { email: string; password: string }) =>
   axios.post(`${API_URL}/auth/login`, data);
 
+/* TIPS */
 export const getTips = (params?: {
   page?: number;
   sort?: string;
@@ -23,7 +25,6 @@ export const getTips = (params?: {
   });
 };
 
-
 export const createTip = (data: FormData) => {
   const token = localStorage.getItem("token");
   return axios.post(`${API_URL}/tip`, data, {
@@ -34,13 +35,12 @@ export const createTip = (data: FormData) => {
   });
 };
 
-
-/* ✅ CREATE AXIOS INSTANCE (ONLY ADDITION) */
+/* AXIOS INSTANCE */
 const API = axios.create({
   baseURL: API_URL,
 });
 
-/* ✅ INTERCEPTOR FIX */
+/* INTERCEPTOR */
 API.interceptors.request.use(req => {
   const token = localStorage.getItem("token");
   if (token) req.headers.Authorization = `Bearer ${token}`;
@@ -50,7 +50,7 @@ API.interceptors.request.use(req => {
 /* DASHBOARD */
 export const fetchDashboard = () => API.get("/dashboard");
 
-// ============Profile===============
+/* PROFILE */
 export const getFollowers = (userId: string) =>
   API.get(`/users/${userId}/followers`);
 

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+import { API_URL } from "../../services/api";
 export default function UserCard() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/users/me/stats", {
+      .get(`${API_URL}/users/me/stats`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
